@@ -137,10 +137,15 @@ empty_interrupt:
 
 input:
 	btst.b	#7,$fffffc00.w
-	beq.s	.done
+	beq	.done
 	btst.b	#0,$fffffc00.w
-	beq.s	.done
+	beq	.done
 	tst.b	$fffffc02.w
+	move.w	#$777,$ffff8240.w
+	.rept	124
+	nop
+	.endr
+	clr.w	$ffff8240.w
 .done:
 	rte
 
