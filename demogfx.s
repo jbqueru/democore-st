@@ -28,7 +28,11 @@ update_thread_entry:
 	move.b	#1,draw_thread_ready
 	clr.b	update_thread_ready
 	jsr	switch_threads
-	bra	update_thread_entry
+; Check for a keypress
+; NOTE: would be good to do that with an interrupt handler, but I'm lazy
+	cmp.b	#$39,$fffffc02.w
+	bne	update_thread_entry
+	rts
 
 draw_thread_entry:
 ;;; Start customized code
@@ -49,14 +53,9 @@ draw_thread_entry:
 	bra	draw_thread_entry
 
 main_thread_entry:
-main_loop:
 ;;; Start customized code
 	move.w	#$007,$ffff8240.w
 	clr.w	$ffff8240.w
 ;;; End customized code
 
-; Check for a keypress
-; NOTE: would be good to do that with an interrupt handler, but I'm lazy
-	cmp.b	#$39,$fffffc02.w
-	bne.s	main_loop
-	rts
+	bra.s	main_thread_entry
