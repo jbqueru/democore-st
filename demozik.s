@@ -16,7 +16,7 @@
 
 music_thread_entry:
 ;;; Start customized code
-	.rept	1000
+	.rept	300
 	move.w	#$770,$ffff8240.w
 	clr.w	$ffff8240.w
 	.endr

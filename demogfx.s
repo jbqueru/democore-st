@@ -16,7 +16,7 @@
 
 update_thread_entry:
 ;;; Start customized code
-	.rept	1000
+	.rept	100
 	move.w	#$070,$ffff8240.w
 	clr.w	$ffff8240.w
 	.endr
