@@ -75,6 +75,7 @@ core_int_save_setup:
 core_int_activate:
 ; Sync interrupts
 
+	move.l	#vbl,$70.w
 	stop	#$2300			; wait for VBL
 
 	move.b	#$1,$fffffa07.w		; activate timer B
@@ -153,17 +154,24 @@ timer:
 	move.b	#1,music_thread_ready
 	bra	switch_from_int
 
+; Modify the address getting checked in the HBL that detects the last line
+vbl:
+	move.b	$ffff8203.w,hbl0+3
+	add.b	#124,hbl0+3
+	rte
 
 hbl:
 	.rept 4
 	move.w	#$077,$ffff8240.w
 	clr.w	$ffff8240.w
 	.endr
-	subq.b	#1,line_count
-	bcs.s	hbl200
+hbl0:
+	; WARNING: hidden self-modifying code, the value being checked is
+	; updated in each VBL to match the last line of the display
+	cmpi.b	#0,$ffff8207.w
+	beq.s	hbl200
 	rte
 hbl200:
-	move.b	#198,line_count
 	; If the draw thread is idle, we can swap framebuffers
 	tst.b	draw_thread_ready	; is the draw thread running
 	bne.s	.fb_ready		; if yes, don't swap frame buffers
@@ -221,7 +229,4 @@ save_mfp_timer_b_data:
 save_mfp_timer_a_control:
 	ds.b	1
 save_mfp_timer_a_data:
-	ds.b	1
-
-line_count:
 	ds.b	1
