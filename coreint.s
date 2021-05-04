@@ -157,7 +157,7 @@ timer:
 ; Modify the address getting checked in the HBL that detects the last line
 vbl:
 	move.b	$ffff8203.w,hbl0+3
-	add.b	#124,hbl0+3
+	add.b	#125,hbl0+3
 	rte
 
 hbl:
