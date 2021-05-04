@@ -83,7 +83,7 @@ core_int_activate:
 
 	stop	#$2300			; wait for last line
 
-	move.b	#200,$fffffa21.w	; count every 200 lines (= 1 screen)
+	move.b	#1,$fffffa21.w		; count every line
 	move.l	#hbl,$120.w		; set up real interrupt routine
 
 	move.b	#$7,$fffffa19.w
@@ -155,6 +155,15 @@ timer:
 
 
 hbl:
+	.rept 4
+	move.w	#$077,$ffff8240.w
+	clr.w	$ffff8240.w
+	.endr
+	subq.b	#1,line_count
+	bcs.s	hbl200
+	rte
+hbl200:
+	move.b	#198,line_count
 	; If the draw thread is idle, we can swap framebuffers
 	tst.b	draw_thread_ready	; is the draw thread running
 	bne.s	.fb_ready		; if yes, don't swap frame buffers
@@ -212,4 +221,7 @@ save_mfp_timer_b_data:
 save_mfp_timer_a_control:
 	ds.b	1
 save_mfp_timer_a_data:
+	ds.b	1
+
+line_count:
 	ds.b	1
